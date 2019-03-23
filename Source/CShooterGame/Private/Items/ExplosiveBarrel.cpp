@@ -25,8 +25,8 @@ AExplosiveBarrel::AExplosiveBarrel()
 
 	ExplosionRadialForce = CreateDefaultSubobject<URadialForceComponent>("ExplosionRadialForce");
 	ExplosionRadialForce->SetupAttachment(Mesh);
-	ExplosionRadialForce->Radius = 250.f;
-	ExplosionRadialForce->bImpulseVelChange = true;
+	ExplosionRadialForce->Radius = 250.f;//作用半径
+	ExplosionRadialForce->bImpulseVelChange = true;//脉冲将忽略物体的质量，并总是导致一个固定的速度变化
 	ExplosionRadialForce->bAutoActivate = false;
 	ExplosionRadialForce->bIgnoreOwningActor = true;
 
@@ -62,6 +62,8 @@ void AExplosiveBarrel::OnHealthChanged(USHealthComponent* HealthComp, float Heal
 		{
 			Mesh->SetMaterial(0, ExplosionMaterial);
 		}
+		
+		ExplosionRadialForce->FireImpulse();//对周围产生影响
 	}
 }
 
