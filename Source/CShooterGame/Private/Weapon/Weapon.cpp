@@ -34,6 +34,8 @@ AWeapon::AWeapon()
 	DamageValue = 20.f;
 	TimeBetweenShots = 0.1f;
 
+	SetReplicates(true);//设置为可复制，这样客户端就有枪了
+
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ME(TEXT("/Game/WeaponEffects/Muzzle/P_Muzzle_Large.P_Muzzle_Large"));
 	MuzzleEffect = ME.Object;
 

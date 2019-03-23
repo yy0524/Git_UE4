@@ -66,6 +66,7 @@ protected:
 
 	bool bWantsToZoom;//是否想开镜
 
+	UPROPERTY(Replicated)//告诉客户端是可以复制的
 	AWeapon* CurrentWeapon;
 
 public:	

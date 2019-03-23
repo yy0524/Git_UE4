@@ -8,6 +8,7 @@
 #include "Engine/World.h"
 #include "Public/Components/SHealthComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "UnrealNetwork.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -37,14 +38,14 @@ ASCharacter::ASCharacter()
 }
 
 // Called when the game starts or when spawned
-void ASCharacter::BeginPlay()
+void ASCharacter::BeginPlay()//beginplay 是客户端和服务端是同时运行的
 {
 	Super::BeginPlay();
 
 	HealthComponent->OnHealthChange.AddDynamic(this, &ASCharacter::OnHealthChanged);
 
 	DefaultFOV = CameraComp->FieldOfView;
-	if (Role == ROLE_Authority)//在服务端生成枪
+	if (Role == ROLE_Authority)//只在服务端生成枪，没有这个，就会服务器和客户端都会生成
 	{
 		if (WeaponClass)
 		{
@@ -165,3 +166,9 @@ FVector ASCharacter::GetPawnViewLocation() const
 	return Super::GetPawnViewLocation();
 }
 
+//告诉复制规则必需写这个函数
+void ASCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASCharacter, CurrentWeapon);
+}
