@@ -83,6 +83,10 @@ void AWeapon::PlayFireEffect(FVector TracerEndPoint)
 void AWeapon::Fire()
 {
 
+	if (Role < ROLE_Authority)//先判断是在客户端，则调用服务器端的fire，这样达到客户端服务器端同时调用
+	{
+		ServerFire();
+	}
 	AActor* MyOwner = GetOwner();
 
 	if (MyOwner)
@@ -144,6 +148,16 @@ void AWeapon::Fire()
 		PlayFireEffect(TracerEnd);
 		LastFireTime = GetWorld()->TimeSeconds;
 	}
+}
+
+void AWeapon::ServerFire_Implementation()
+{
+	Fire();
+}
+
+bool AWeapon::ServerFire_Validate()
+{
+	return true;
 }
 
 void AWeapon::StartFire()

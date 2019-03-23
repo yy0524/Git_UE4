@@ -66,6 +66,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		void Fire();
 
+	UFUNCTION(Server, Reliable, WithValidation)//WithValidation检验合法性
+		void ServerFire();
+
 public:	
 
 	void StartFire();
