@@ -55,6 +55,7 @@ AWeapon::AWeapon()
 void AWeapon::OnRep_HitScanTrace()
 {
 	PlayFireEffect(HitScanTrace.TraceTo);
+	PlayImpactEffect(HitScanTrace.PhysicalSurfaceType, HitScanTrace.TraceTo);
 }
 
 void AWeapon::PlayFireEffect(FVector TracerEndPoint)
@@ -112,38 +113,17 @@ void AWeapon::Fire()
 		//FCollisionResponseParams ResponseParams;
 	
 		FHitResult OutHit;
+		EPhysicalSurface SurfaceType;
 		if (GetWorld()->LineTraceSingleByChannel(OutHit, EyeLocation, EndLocation, COLLISION_WEAPON, Params))
 		{
 			AActor* HitActor = OutHit.GetActor();
-
-			EPhysicalSurface PhysicalSurfaceType = UPhysicalMaterial::DetermineSurfaceType(OutHit.PhysMaterial.Get());
-
-			UParticleSystem* SelectParticle = nullptr;
-
-			float DamageInstance;
-			switch (PhysicalSurfaceType)
-			{
-			case SURFACETYPE_FleshDefault:
-				SelectParticle = FleshImpactEffect;
-				DamageInstance = DamageValue;
-			case SURFACETYPE_FleshVulnerable:
-				SelectParticle = FleshImpactEffect;
-				DamageInstance = DamageValue * 4;
-				break;
-			default:
-				SelectParticle = DefaultImpactEffect;
-				DamageInstance = DamageValue * 4;
-				break;
-			}
-
-			UGameplayStatics::ApplyPointDamage(HitActor, DamageInstance, ShotDirection, OutHit, MyOwner->GetInstigatorController(), this, DamageType);
-
-			if (SelectParticle)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SelectParticle, OutHit.ImpactPoint, OutHit.ImpactNormal.Rotation());
-			}
-
+			SurfaceType = UPhysicalMaterial::DetermineSurfaceType(OutHit.PhysMaterial.Get());
 			TracerEnd = OutHit.ImpactPoint;
+
+			UGameplayStatics::ApplyPointDamage(HitActor, DamageValue * 4, ShotDirection, OutHit, MyOwner->GetInstigatorController(), this, DamageType);
+
+
+			PlayImpactEffect(SurfaceType, TracerEnd);
 		
 		}
 		if (DebugWeaponDrawing > 0)
@@ -156,9 +136,36 @@ void AWeapon::Fire()
 		if (Role == ROLE_Authority)
 		{
 			HitScanTrace.TraceTo = TracerEnd;
+			HitScanTrace.PhysicalSurfaceType = SurfaceType;
 		}
 		
 		LastFireTime = GetWorld()->TimeSeconds;
+	}
+}
+
+void AWeapon::PlayImpactEffect(EPhysicalSurface SurfaceType, FVector ImpactPoint)
+{
+
+	UParticleSystem* SelectParticle = nullptr;
+
+	switch (SurfaceType)
+	{
+	case SURFACETYPE_FleshDefault:
+	case SURFACETYPE_FleshVulnerable:
+		SelectParticle = FleshImpactEffect;
+		break;
+	default:
+		SelectParticle = DefaultImpactEffect;
+		break;
+	}
+
+	FVector StartTrace = Mesh->GetSocketLocation(MuzzleSocketName);
+	FVector ShotDir = ImpactPoint - StartTrace;
+	ShotDir.Normalize();
+
+	if (SelectParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SelectParticle, ImpactPoint,ShotDir.Rotation());
 	}
 }
 

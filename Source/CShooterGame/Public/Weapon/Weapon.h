@@ -11,17 +11,18 @@ class UParticleSystem;
 class UDamageType;
 class UCameraShake;
 
-USTRUCT()//创建结构体记录子弹射线起始和结束位置
+//创建结构体记录子弹射线起始和结束位置
+USTRUCT()
 struct FHitScanTrace
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY()
-	FVector_NetQuantizeNormal TraceFrom;
+		TEnumAsByte<EPhysicalSurface> PhysicalSurfaceType;//网络复制中不识别枚举，所以要用TEnumAsByte强转
 
 	UPROPERTY()
-	FVector_NetQuantizeNormal TraceTo;
+		FVector_NetQuantizeNormal TraceTo;
 };
 
 UCLASS()
@@ -75,7 +76,8 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_HitScanTrace)
 	FHitScanTrace HitScanTrace;
 
-	UFUNCTION()//HitScanTrace发生变化触发此函数
+	//HitScanTrace发生变化触发此函数
+	UFUNCTION()
 	void OnRep_HitScanTrace();
 
 protected:
@@ -85,8 +87,11 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 		void Fire();
 
-	UFUNCTION(Server, Reliable, WithValidation)//WithValidation检验合法性
+	//WithValidation检验合法性
+	UFUNCTION(Server, Reliable, WithValidation)
 		void ServerFire();
+
+	void PlayImpactEffect(EPhysicalSurface SurfaceType,FVector ImpactPoint);
 
 public:	
 
