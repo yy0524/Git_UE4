@@ -11,6 +11,19 @@ class UParticleSystem;
 class UDamageType;
 class UCameraShake;
 
+USTRUCT()//创建结构体记录子弹射线起始和结束位置
+struct FHitScanTrace
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	FVector_NetQuantizeNormal TraceFrom;
+
+	UPROPERTY()
+	FVector_NetQuantizeNormal TraceTo;
+};
+
 UCLASS()
 class CSHOOTERGAME_API AWeapon : public AActor
 {
@@ -58,6 +71,12 @@ protected:
 	FTimerHandle  TimerHandle_TimeBetweenShots;
 
 	float LastFireTime;
+
+	UPROPERTY(ReplicatedUsing = OnRep_HitScanTrace)
+	FHitScanTrace HitScanTrace;
+
+	UFUNCTION()//HitScanTrace发生变化触发此函数
+	void OnRep_HitScanTrace();
 
 protected:
 

@@ -11,6 +11,7 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "CShooterGame.h"
 #include "TimerManager.h"
+#include "UnrealNetwork.h"
 
 static int32 DebugWeaponDrawing = 0;
 FAutoConsoleVariableRef CVARDebugWeaponDrawing(
@@ -50,6 +51,11 @@ AWeapon::AWeapon()
 
 }
 
+
+void AWeapon::OnRep_HitScanTrace()
+{
+	PlayFireEffect(HitScanTrace.TraceTo);
+}
 
 void AWeapon::PlayFireEffect(FVector TracerEndPoint)
 {
@@ -146,6 +152,12 @@ void AWeapon::Fire()
 		}
 
 		PlayFireEffect(TracerEnd);
+
+		if (Role == ROLE_Authority)
+		{
+			HitScanTrace.TraceTo = TracerEnd;
+		}
+		
 		LastFireTime = GetWorld()->TimeSeconds;
 	}
 }
@@ -171,3 +183,9 @@ void AWeapon::EndFire()
 	GetWorldTimerManager().ClearTimer(TimerHandle_TimeBetweenShots);
 }
 
+//告诉复制规则必需写这个函数
+void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(AWeapon, HitScanTrace,COND_SkipOwner);//忽略自身
+}
