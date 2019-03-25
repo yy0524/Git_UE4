@@ -7,6 +7,7 @@
 #include "STrackerBot.generated.h"
 
 class USHealthComponent;
+class UMaterialInstanceDynamic;
 
 UCLASS()
 class CSHOOTERGAME_API ASTrackerBot : public APawn
@@ -32,6 +33,8 @@ protected:
 		float RequiredDistanceToTarget;
 
 	FVector NextPathPoint;
+
+	UMaterialInstanceDynamic* MatInst;
 
 protected:
 	// Called when the game starts or when spawned

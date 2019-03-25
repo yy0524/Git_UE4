@@ -8,6 +8,7 @@
 #include "NavigationPath.h"
 #include "SHepler.h"
 #include "SHealthComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 // Sets default values
 ASTrackerBot::ASTrackerBot()
@@ -38,6 +39,14 @@ void ASTrackerBot::BeginPlay()
 void ASTrackerBot::HandleTakeDamage(USHealthComponent* HealthComp, float Health, float HealthDatle, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
 	SHelper::Debug("Health is " + FString::SanitizeFloat(Health) + " of " + GetName());
+	if (!MatInst)
+	{
+		MatInst = Mesh->CreateAndSetMaterialInstanceDynamicFromMaterial(0, Mesh->GetMaterial(0));	
+	}
+	else
+	{
+		MatInst->SetScalarParameterValue("LastTimeDamageTaken",GetWorld()->TimeSeconds);
+	}
 }
 
 FVector ASTrackerBot::GetNextPathPoint()
