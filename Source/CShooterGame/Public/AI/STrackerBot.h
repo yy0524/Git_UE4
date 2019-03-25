@@ -20,9 +20,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Componets")
 		UStaticMeshComponent* Mesh;
 
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+		float MovementForce;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+		float RequiredDistanceToTarget;
+
+	FVector NextPathPoint;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	FVector GetNextPathPoint();
 
 public:	
 	// Called every frame

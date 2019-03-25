@@ -115,7 +115,7 @@ void AWeapon::Fire()
 		//FCollisionResponseParams ResponseParams;
 	
 		FHitResult OutHit;
-		EPhysicalSurface SurfaceType;
+		EPhysicalSurface SurfaceType = SURFACETYPE_FleshDefault;
 		if (GetWorld()->LineTraceSingleByChannel(OutHit, EyeLocation, EndLocation, COLLISION_WEAPON, Params))
 		{
 			AActor* HitActor = OutHit.GetActor();
@@ -143,7 +143,7 @@ void AWeapon::Fire()
 		if (Role == ROLE_Authority)
 		{
 			HitScanTrace.TraceTo = TracerEnd;
-			SHelper::Debug("O:" + TracerEnd.ToString());
+			//SHelper::Debug("O:" + TracerEnd.ToString());
 			HitScanTrace.PhysicalSurfaceType = SurfaceType;
 		}
 		
