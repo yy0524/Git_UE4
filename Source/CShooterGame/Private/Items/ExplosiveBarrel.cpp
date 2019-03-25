@@ -7,6 +7,7 @@
 #include "ConstructorHelpers.h"
 #include "Particles/ParticleSystem.h"
 #include "Materials/MaterialInterface.h"
+#include "UnrealNetwork.h"
 
 
 // Sets default values
@@ -39,8 +40,23 @@ AExplosiveBarrel::AExplosiveBarrel()
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> PS(TEXT("/Game/WeaponEffects/Explosion/P_Explosion"));
 	ExplosionParticle = PS.Object;
 
+	SetReplicates(true);
+	SetReplicateMovement(true);//移动也要设置成可复制
 }
 
+
+void AExplosiveBarrel::OnRep_Explosvied()
+{
+	if (ExplosionParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation());
+	}
+
+	if (ExplosionMaterial)
+	{
+		Mesh->SetMaterial(0, ExplosionMaterial);
+	}
+}
 
 void AExplosiveBarrel::OnHealthChanged(USHealthComponent* HealthComp, float Health, float HealthDatle, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
@@ -53,18 +69,15 @@ void AExplosiveBarrel::OnHealthChanged(USHealthComponent* HealthComp, float Heal
 		bExplosived = true;
 		FVector BoostIntensity = FVector::UpVector * ExplosionImpulse;
 		Mesh->AddImpulse(BoostIntensity, NAME_None, true);
-		if (ExplosionParticle)
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation());
-		}
 
-		if (ExplosionMaterial)
-		{
-			Mesh->SetMaterial(0, ExplosionMaterial);
-		}
-		
 		ExplosionRadialForce->FireImpulse();//对周围产生影响
 	}
 }
 
+//告诉复制规则必需写这个函数
+void AExplosiveBarrel::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AExplosiveBarrel, bExplosived);
+}
 

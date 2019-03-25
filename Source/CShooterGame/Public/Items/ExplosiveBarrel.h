@@ -37,9 +37,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Explosion")
 		float ExplosionImpulse;
 
+	UPROPERTY(ReplicatedUsing = OnRep_Explosvied)
 	bool bExplosived;
 
+
 protected:
+
+	UFUNCTION()
+		void OnRep_Explosvied();
 
 	UFUNCTION()
 	void OnHealthChanged(USHealthComponent* HealthComp, float Health, float HealthDatle, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
