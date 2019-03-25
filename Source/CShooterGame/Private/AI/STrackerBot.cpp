@@ -12,6 +12,8 @@ ASTrackerBot::ASTrackerBot()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
 
+	Mesh->SetCanEverAffectNavigation(false);//不影响导航网格
+
 }
 
 // Called when the game starts or when spawned
