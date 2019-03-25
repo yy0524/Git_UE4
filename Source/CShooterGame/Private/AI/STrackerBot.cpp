@@ -9,6 +9,7 @@
 #include "SHepler.h"
 #include "SHealthComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ASTrackerBot::ASTrackerBot()
@@ -25,6 +26,9 @@ ASTrackerBot::ASTrackerBot()
 
 	HealthComponent = CreateDefaultSubobject<USHealthComponent>(TEXT("HealthComponent"));
 	HealthComponent->OnHealthChange.AddDynamic(this,&ASTrackerBot::HandleTakeDamage);
+	bExplosived = false;
+	ExplosionRadius = 200.f;
+	ExplosionDamage = 40.f;
 	
 }
 
@@ -38,7 +42,6 @@ void ASTrackerBot::BeginPlay()
 
 void ASTrackerBot::HandleTakeDamage(USHealthComponent* HealthComp, float Health, float HealthDatle, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
-	SHelper::Debug("Health is " + FString::SanitizeFloat(Health) + " of " + GetName());
 	if (!MatInst)
 	{
 		MatInst = Mesh->CreateAndSetMaterialInstanceDynamicFromMaterial(0, Mesh->GetMaterial(0));	
@@ -46,6 +49,11 @@ void ASTrackerBot::HandleTakeDamage(USHealthComponent* HealthComp, float Health,
 	else
 	{
 		MatInst->SetScalarParameterValue("LastTimeDamageTaken",GetWorld()->TimeSeconds);
+	}
+
+	if (Health <= 0.f)
+	{
+		SelfDestruct();
 	}
 }
 
@@ -60,6 +68,27 @@ FVector ASTrackerBot::GetNextPathPoint()
 		return NavPath->PathPoints[1];
 	}
 	return GetActorLocation();
+}
+
+void ASTrackerBot::SelfDestruct()
+{
+	if (bExplosived)
+	{
+		return;
+	}
+	bExplosived = true;
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
+	UGameplayStatics::ApplyRadialDamage(this, ExplosionDamage, GetActorLocation(), ExplosionRadius, nullptr, IgnoreActors, this, GetInstigatorController(), true);
+	
+	DrawDebugSphere(GetWorld(),GetActorLocation(),ExplosionRadius,12,FColor::Red,false,2.f,0,1.0f);
+
+	if (ExplosionEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ExplosionEffect,GetActorLocation());
+	}
+	
+	Destroy();
 }
 
 // Called every frame

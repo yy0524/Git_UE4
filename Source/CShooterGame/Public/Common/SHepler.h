@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/Engine.h"
+#include "LogMacros.h"
 
 /**
  * 
@@ -15,6 +16,7 @@ namespace SHelper//ÆÁÄ»ÉÏÊä³ö
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, Duration, FColor::Yellow, Message);
+			UE_LOG(LogTemp,Warning,TEXT("%s"),*Message);
 		}
 	}
 }

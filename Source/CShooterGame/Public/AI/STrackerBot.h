@@ -32,9 +32,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
 		float RequiredDistanceToTarget;
 
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+		UParticleSystem* ExplosionEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+		float ExplosionDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+		float ExplosionRadius;
+
+	
 	FVector NextPathPoint;
 
 	UMaterialInstanceDynamic* MatInst;
+
+	bool bExplosived;
 
 protected:
 	// Called when the game starts or when spawned
@@ -44,6 +56,8 @@ protected:
 		void HandleTakeDamage(USHealthComponent* HealthComp, float Health, float HealthDatle, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 	FVector GetNextPathPoint();
+
+	void SelfDestruct();//Ïú»Ù×ÔÉí
 	
 public:	
 	// Called every frame

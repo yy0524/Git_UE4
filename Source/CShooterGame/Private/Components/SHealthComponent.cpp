@@ -2,6 +2,7 @@
 
 #include "Public/Components/SHealthComponent.h"
 #include "UnrealNetwork.h"
+#include "SHepler.h"
 
 
 // Sets default values for this component's properties
@@ -26,8 +27,6 @@ void USHealthComponent::BeginPlay()
 				AddDynamic(this, &USHealthComponent::HandleTakeAnyDamage);
 		}
 	}
-
-	
 }
 
 void USHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
@@ -39,6 +38,8 @@ void USHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, 
 
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage,0.f,DefaultHealth);
 	OnHealthChange.Broadcast(this,CurrentHealth,Damage,DamageType,InstigatedBy,DamageCauser);
+
+	SHelper::Debug(GetOwner()->GetName()+ " Health: "+ FString::SanitizeFloat(CurrentHealth));
 }
 
 
