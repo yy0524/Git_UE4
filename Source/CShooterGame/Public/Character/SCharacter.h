@@ -59,7 +59,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 		USHealthComponent* HealthComponent;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	UPROPERTY(Replicated,BlueprintReadOnly, Category = "Health")
 		bool bDied;
 
 	float DefaultFOV;

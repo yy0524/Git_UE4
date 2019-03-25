@@ -12,6 +12,7 @@
 #include "CShooterGame.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
+#include "SHepler.h"
 
 static int32 DebugWeaponDrawing = 0;
 FAutoConsoleVariableRef CVARDebugWeaponDrawing(
@@ -54,6 +55,7 @@ AWeapon::AWeapon()
 
 void AWeapon::OnRep_HitScanTrace()
 {
+	SHelper::Debug("T:"+ HitScanTrace.TraceTo.ToString());
 	PlayFireEffect(HitScanTrace.TraceTo);
 	PlayImpactEffect(HitScanTrace.PhysicalSurfaceType, HitScanTrace.TraceTo);
 }
@@ -120,7 +122,12 @@ void AWeapon::Fire()
 			SurfaceType = UPhysicalMaterial::DetermineSurfaceType(OutHit.PhysMaterial.Get());
 			TracerEnd = OutHit.ImpactPoint;
 
-			UGameplayStatics::ApplyPointDamage(HitActor, DamageValue * 4, ShotDirection, OutHit, MyOwner->GetInstigatorController(), this, DamageType);
+			float ActualDamage = DamageValue;
+			if (SurfaceType == SURFACETYPE_FleshVulnerable)
+			{
+				ActualDamage = DamageValue * 4;
+			}
+			UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, OutHit, MyOwner->GetInstigatorController(), this, DamageType);
 
 
 			PlayImpactEffect(SurfaceType, TracerEnd);
@@ -136,6 +143,7 @@ void AWeapon::Fire()
 		if (Role == ROLE_Authority)
 		{
 			HitScanTrace.TraceTo = TracerEnd;
+			SHelper::Debug("O:" + TracerEnd.ToString());
 			HitScanTrace.PhysicalSurfaceType = SurfaceType;
 		}
 		
@@ -159,12 +167,11 @@ void AWeapon::PlayImpactEffect(EPhysicalSurface SurfaceType, FVector ImpactPoint
 		break;
 	}
 
-	FVector StartTrace = Mesh->GetSocketLocation(MuzzleSocketName);
-	FVector ShotDir = ImpactPoint - StartTrace;
-	ShotDir.Normalize();
-
 	if (SelectParticle)
 	{
+		FVector StartTrace = Mesh->GetSocketLocation(MuzzleSocketName);
+		FVector ShotDir = ImpactPoint - StartTrace;
+		ShotDir.Normalize();
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SelectParticle, ImpactPoint,ShotDir.Rotation());
 	}
 }

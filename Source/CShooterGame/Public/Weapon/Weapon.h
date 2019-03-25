@@ -74,11 +74,11 @@ protected:
 	float LastFireTime;
 
 	UPROPERTY(ReplicatedUsing = OnRep_HitScanTrace)
-	FHitScanTrace HitScanTrace;
+		FHitScanTrace HitScanTrace;
 
 	//HitScanTrace发生变化触发此函数
 	UFUNCTION()
-	void OnRep_HitScanTrace();
+		void OnRep_HitScanTrace();
 
 protected:
 
