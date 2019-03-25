@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "STrackerBot.generated.h"
 
+class USHealthComponent;
+
 UCLASS()
 class CSHOOTERGAME_API ASTrackerBot : public APawn
 {
@@ -20,6 +22,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Componets")
 		UStaticMeshComponent* Mesh;
 
+	UPROPERTY(VisibleAnywhere, Category = "Componets")
+		USHealthComponent* HealthComponent;
+
 	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
 		float MovementForce;
 
@@ -32,8 +37,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	FVector GetNextPathPoint();
+	UFUNCTION()
+		void HandleTakeDamage(USHealthComponent* HealthComp, float Health, float HealthDatle, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
+	FVector GetNextPathPoint();
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

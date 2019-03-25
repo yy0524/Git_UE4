@@ -33,7 +33,7 @@ AWeapon::AWeapon()
 	Mesh->SetupAttachment(Root);
 
 	MuzzleSocketName = FName("MuzzleFlashSocket");
-	DamageValue = 20.f;
+	BaseDamage = 20.f;
 	TimeBetweenShots = 0.1f;
 
 	SetReplicates(true);//设置为可复制，这样客户端就有枪了
@@ -55,7 +55,7 @@ AWeapon::AWeapon()
 
 void AWeapon::OnRep_HitScanTrace()
 {
-	SHelper::Debug("T:"+ HitScanTrace.TraceTo.ToString());
+	//SHelper::Debug("T:"+ HitScanTrace.TraceTo.ToString());
 	PlayFireEffect(HitScanTrace.TraceTo);
 	PlayImpactEffect(HitScanTrace.PhysicalSurfaceType, HitScanTrace.TraceTo);
 }
@@ -96,6 +96,7 @@ void AWeapon::Fire()
 	{
 		ServerFire();
 	}
+
 	AActor* MyOwner = GetOwner();
 
 	if (MyOwner)
@@ -122,10 +123,10 @@ void AWeapon::Fire()
 			SurfaceType = UPhysicalMaterial::DetermineSurfaceType(OutHit.PhysMaterial.Get());
 			TracerEnd = OutHit.ImpactPoint;
 
-			float ActualDamage = DamageValue;
+			float ActualDamage = BaseDamage;
 			if (SurfaceType == SURFACETYPE_FleshVulnerable)
 			{
-				ActualDamage = DamageValue * 4;
+				ActualDamage = BaseDamage * 4;
 			}
 			UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, OutHit, MyOwner->GetInstigatorController(), this, DamageType);
 

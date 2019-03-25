@@ -64,7 +64,7 @@ protected:
 		TSubclassOf<UCameraShake> FireCameraShake;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-		float DamageValue;
+		float BaseDamage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 		float TimeBetweenShots;

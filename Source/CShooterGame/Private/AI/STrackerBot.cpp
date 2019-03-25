@@ -6,6 +6,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "NavigationPath.h"
+#include "SHepler.h"
+#include "SHealthComponent.h"
 
 // Sets default values
 ASTrackerBot::ASTrackerBot()
@@ -19,6 +21,10 @@ ASTrackerBot::ASTrackerBot()
 	Mesh->SetSimulatePhysics(true);
 	MovementForce = 1000.f;
 	RequiredDistanceToTarget = 100.f;
+
+	HealthComponent = CreateDefaultSubobject<USHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent->OnHealthChange.AddDynamic(this,&ASTrackerBot::HandleTakeDamage);
+	
 }
 
 // Called when the game starts or when spawned
@@ -27,6 +33,11 @@ void ASTrackerBot::BeginPlay()
 	Super::BeginPlay();
 	GetNextPathPoint();
 	
+}
+
+void ASTrackerBot::HandleTakeDamage(USHealthComponent* HealthComp, float Health, float HealthDatle, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+	SHelper::Debug("Health is " + FString::SanitizeFloat(Health) + " of " + GetName());
 }
 
 FVector ASTrackerBot::GetNextPathPoint()
